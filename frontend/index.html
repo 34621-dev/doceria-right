@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Doceria Delícias & Magia | Sistema de Gestão</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Cabeçalho Principal -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="brand">
+        <span class="brand-icon">🍰</span>
+        <div>
+          <h1 class="brand-title">Doceria Delícias & Magia</h1>
+          <p class="brand-subtitle">Mini Sistema de Gestão de Confeitaria</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <div class="badge-counter" id="totalDocesBadge">
+          <span>Total:</span> <strong id="totalDocesCount">0</strong>
+        </div>
+        <button class="btn btn-primary" id="btnNovoDoce">
+          <span class="btn-icon">✨</span> Novo Doce
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Conteúdo Principal -->
+  <main class="main-container">
+    <!-- Barra de Filtros e Busca -->
+    <section class="controls-section">
+      <div class="search-box">
+        <span class="search-icon">🔍</span>
+        <input 
+          type="text" 
+          id="searchInput" 
+          placeholder="Buscar doce por nome..." 
+          aria-label="Buscar doce por nome"
+        >
+        <button type="button" class="btn-clear-search" id="btnClearSearch" title="Limpar busca" style="display: none;">✕</button>
+      </div>
+
+      <div class="filter-pills" id="filterPills">
+        <button class="pill active" data-type="todos">Todos</button>
+        <button class="pill" data-type="Bolo">Bolos</button>
+        <button class="pill" data-type="Torta">Tortas</button>
+        <button class="pill" data-type="Brigadeiro">Brigadeiros</button>
+        <button class="pill" data-type="Cupcake">Cupcakes</button>
+        <button class="pill" data-type="Docinho">Docinhos</button>
+        <button class="pill" data-type="Sobremesa">Sobremesas</button>
+        <button class="pill" data-type="Outros">Outros</button>
+      </div>
+    </section>
+
+    <!-- Indicador de Carregamento -->
+    <div class="loading-state" id="loadingState">
+      <div class="spinner"></div>
+      <p>Carregando delícias do cardápio...</p>
+    </div>
+
+    <!-- Estado Vazio -->
+    <div class="empty-state" id="emptyState" style="display: none;">
+      <span class="empty-icon">🧁</span>
+      <h3 id="emptyStateTitle">Nenhum doce cadastrado ainda</h3>
+      <p id="emptyStateDesc">Clique no botão abaixo para adicionar a primeira delícia ao cardápio!</p>
+      <button class="btn btn-primary" id="btnEmptyNovoDoce">Cadastrar Doce</button>
+    </div>
+
+    <!-- Grid de Doces -->
+    <section class="doces-grid" id="docesGrid" aria-live="polite">
+      <!-- Cards serão injetados dinamicamente via JavaScript -->
+    </section>
+  </main>
+
+  <!-- Modal de Cadastro / Edição -->
+  <div class="modal-backdrop" id="doceModal" aria-hidden="true" role="dialog" aria-labelledby="modalTitle">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h2 class="modal-title" id="modalTitle">Cadastrar Novo Doce</h2>
+        <button type="button" class="btn-close" id="btnFecharModal" aria-label="Fechar">&times;</button>
+      </div>
+      <form id="doceForm" novalidate>
+        <input type="hidden" id="doceId" value="">
+
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="doceNome">Nome do Doce <span class="required">*</span></label>
+            <input 
+              type="text" 
+              id="doceNome" 
+              class="form-control" 
+              placeholder="Ex: Bolo de Cenoura com Chocolate" 
+              required
+              minlength="2"
+            >
+            <span class="field-error" id="erroNome"></span>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group col-half">
+              <label for="doceTipo">Tipo / Categoria <span class="required">*</span></label>
+              <select id="doceTipo" class="form-control" required>
+                <option value="" disabled selected>Selecione um tipo...</option>
+                <option value="Bolo">Bolo</option>
+                <option value="Torta">Torta</option>
+                <option value="Brigadeiro">Brigadeiro</option>
+                <option value="Cupcake">Cupcake</option>
+                <option value="Docinho">Docinho</option>
+                <option value="Sobremesa">Sobremesa</option>
+                <option value="Outro">Outro</option>
+              </select>
+              <span class="field-error" id="erroTipo"></span>
+            </div>
+
+            <div class="form-group col-half">
+              <label for="docePreco">Preço (R$) <span class="required">*</span></label>
+              <input 
+                type="number" 
+                id="docePreco" 
+                class="form-control" 
+                placeholder="Ex: 14.50" 
+                step="0.01" 
+                min="0" 
+                required
+              >
+              <span class="field-error" id="erroPreco"></span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="doceFotoUrl">URL da Foto <span class="required">*</span></label>
+            <input 
+              type="url" 
+              id="doceFotoUrl" 
+              class="form-control" 
+              placeholder="Ex: https://images.unsplash.com/photo-..." 
+              required
+            >
+            <span class="field-error" id="erroFotoUrl"></span>
+          </div>
+
+          <!-- Preview da Imagem -->
+          <div class="image-preview-container" id="imagePreviewContainer">
+            <p class="preview-label">Pré-visualização da imagem:</p>
+            <div class="preview-box">
+              <img id="imagePreview" src="" alt="Prévia da foto" style="display: none;">
+              <span id="previewPlaceholder">Insira uma URL válida para visualizar</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="btnCancelarModal">Cancelar</button>
+          <button type="submit" class="btn btn-primary" id="btnSalvarDoce">
+            <span class="btn-spinner" style="display: none;"></span>
+            <span class="btn-text">Salvar Doce</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal de Confirmação de Exclusão -->
+  <div class="modal-backdrop" id="confirmDeleteModal" aria-hidden="true" role="dialog" aria-labelledby="confirmDeleteTitle">
+    <div class="modal-dialog modal-dialog-sm">
+      <div class="modal-header">
+        <h2 class="modal-title text-danger" id="confirmDeleteTitle">Confirmar Exclusão</h2>
+        <button type="button" class="btn-close" id="btnFecharConfirmDelete" aria-label="Fechar">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p>Você tem certeza de que deseja remover o doce <strong id="deleteDoceNome"></strong>?</p>
+        <p class="text-muted small">Esta ação não poderá ser desfeita.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="btnCancelarDelete">Cancelar</button>
+        <button type="button" class="btn btn-danger" id="btnConfirmarDelete">
+          <span class="btn-spinner" style="display: none;"></span>
+          <span class="btn-text">Excluir</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Container de Toasts / Notificações -->
+  <div class="toast-container" id="toastContainer" aria-live="assertive"></div>
+
+  <!-- Rodapé -->
+  <footer class="app-footer">
+    <p>🍰 Doceria Delícias & Magia &bull; Sistema de Gestão Full Stack</p>
+  </footer>
+
+  <script src="main.js"></script>
+</body>
+</html>
