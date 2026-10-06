@@ -44,14 +44,14 @@ async function connectDB() {
         }
       }
 
-      // Se estiver em produção (Vercel) e MONGODB_URI não foi configurada
-      if (!uri && process.env.NODE_ENV === 'production') {
-        const erroMsg = 'A variável de ambiente MONGODB_URI não foi definida na Vercel. Por favor, adicione sua connection string do MongoDB Atlas nas variáveis de ambiente do projeto (Settings > Environment Variables).';
-        console.error('❌', erroMsg);
-        throw new Error(erroMsg);
+      // Se estiver em ambiente de nuvem (Vercel) e MONGODB_URI não foi configurada
+      const isCloudEnv = process.env.VERCEL === '1' || process.env.NODE_ENV === 'production';
+      if (!uri && isCloudEnv) {
+        console.warn('⚠️ MONGODB_URI não definida no ambiente de produção. O sistema usará armazenamento em memória para demonstração.');
+        return null;
       }
 
-      // 2. Fallback automático para desenvolvimento: inicializa MongoMemoryServer
+      // 2. Fallback para desenvolvimento local: inicializa MongoMemoryServer se disponível
       try {
         console.log('🚀 Inicializando banco de dados MongoDB em memória para desenvolvimento...');
         const { MongoMemoryServer } = require('mongodb-memory-server');
@@ -70,8 +70,8 @@ async function connectDB() {
 
         return instance;
       } catch (fallbackErr) {
-        console.error('❌ Falha ao inicializar o banco de dados em memória:', fallbackErr.message);
-        throw fallbackErr;
+        console.warn('⚠️ Não foi possível inicializar MongoMemoryServer:', fallbackErr.message);
+        return null;
       }
     })();
   }
