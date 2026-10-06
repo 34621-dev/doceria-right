@@ -44,6 +44,13 @@ async function connectDB() {
         }
       }
 
+      // Se estiver em produção (Vercel) e MONGODB_URI não foi configurada
+      if (!uri && process.env.NODE_ENV === 'production') {
+        const erroMsg = 'A variável de ambiente MONGODB_URI não foi definida na Vercel. Por favor, adicione sua connection string do MongoDB Atlas nas variáveis de ambiente do projeto (Settings > Environment Variables).';
+        console.error('❌', erroMsg);
+        throw new Error(erroMsg);
+      }
+
       // 2. Fallback automático para desenvolvimento: inicializa MongoMemoryServer
       try {
         console.log('🚀 Inicializando banco de dados MongoDB em memória para desenvolvimento...');

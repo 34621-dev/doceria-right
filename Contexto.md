@@ -31,28 +31,30 @@ O **Doceria System** é uma aplicação web full stack projetada como um sistema
 - **Estrutura de Arquivos Final**:
   ```text
   doceria/
+  ├── vercel.json           # Configuração de rotas da Vercel (Raiz do projeto)
+  ├── package.json          # Dependências unificadas e scripts de execução
+  ├── .gitignore            # Ignora node_modules e arquivos sensíveis
   ├── backend/
   │   ├── api/
-  │   │   └── index.js          # Ponto de entrada para Serverless Function na Vercel
+  │   │   └── index.js      # Ponto de entrada para Serverless Function na Vercel
   │   ├── src/
-  │   │   ├── config/           # Conexão com MongoDB (Mongoose) com cache serverless
-  │   │   ├── models/           # Schema do Doce (nome, tipo, preco, fotoUrl, createdAt)
-  │   │   ├── controllers/      # Controllers CRUD com validação
-  │   │   ├── routes/           # Rotas /api/doces
-  │   │   ├── app.js            # Express app com middlewares, CORS e arquivos estáticos
-  │   │   └── server.js         # Inicialização do servidor local
+  │   │   ├── config/       # Conexão com MongoDB (Mongoose) com cache serverless
+  │   │   ├── models/       # Schema do Doce (nome, tipo, preco, fotoUrl, createdAt)
+  │   │   ├── controllers/  # Controllers CRUD com validação
+  │   │   ├── routes/       # Rotas /api/doces
+  │   │   ├── app.js        # Express app com middlewares, CORS e arquivos estáticos
+  │   │   └── server.js     # Inicialização do servidor local
   │   ├── tests/
-  │   │   └── api.test.js       # Testes automatizados com MongoMemoryServer e Supertest
-  │   ├── .env                  # Configurações de desenvolvimento local (não commitado)
-  │   ├── package.json          # Dependências e scripts
-  │   └── vercel.json           # Configuração de rotas da Vercel
+  │   │   └── api.test.js   # Testes automatizados com MongoMemoryServer e Supertest
+  │   ├── .env              # Configurações de desenvolvimento local (não commitado)
+  │   └── package.json      # Dependências e scripts do backend
   ├── frontend/
-  │   ├── index.html            # Interface de listagem e cadastro
-  │   ├── style.css             # Estilização limpa e responsiva
-  │   └── main.js               # Consumo da API via Fetch API
-  ├── Roadmap.md                # Lista detalhada de etapas do desenvolvimento
-  ├── Contexto.md               # Resumo do estado atual da aplicação
-  └── api.md                    # Documentação dos endpoints para testes
+  │   ├── index.html        # Interface de listagem e cadastro
+  │   ├── style.css         # Estilização limpa e responsiva
+  │   └── main.js           # Consumo da API via Fetch API
+  ├── Roadmap.md            # Lista detalhada de etapas do desenvolvimento
+  ├── Contexto.md           # Resumo do estado atual da aplicação
+  └── api.md                # Documentação dos endpoints para testes
   ```
 
 ---
@@ -81,7 +83,9 @@ npm test
    - Endpoint de Doces: `http://localhost:3000/api/doces`
 
 ### Como fazer deploy na Vercel
-1. Instale a Vercel CLI ou conecte o repositório GitHub à Vercel.
-2. Defina a variável de ambiente `MONGODB_URI` nas configurações de projeto da Vercel (`Project Settings` > `Environment Variables`).
-3. O arquivo `vercel.json` e `api/index.js` já estão configurados para redirecionar as chamadas para a Serverless Function do Express.
+1. O arquivo `vercel.json` e `package.json` na raiz gerenciam tanto o frontend estático quanto as Serverless Functions da pasta `backend/`.
+2. No painel da Vercel, o **Root Directory** deve permanecer como `./` (raiz do repositório).
+3. Defina a variável de ambiente `MONGODB_URI` nas configurações de projeto da Vercel (`Project Settings` > `Environment Variables`) com a sua string de conexão do MongoDB Atlas.
+4. Ao fazer `git push`, a Vercel implantará automaticamente o frontend e as rotas `/api/doces`.
+
 

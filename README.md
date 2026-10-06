@@ -6,6 +6,9 @@ Mini sistema de gestão para confeitarias e docerias desenvolvido com **Node.js*
 
 ```
 doceria/
+├── vercel.json       # Configuração unificada de deploy na Vercel (Raiz)
+├── package.json      # Dependências e scripts unificados
+├── .gitignore        # Ignora node_modules, .env e arquivos locais
 ├── backend/          # API REST (Express + Mongoose)
 │   ├── api/          # Ponto de entrada Serverless (Vercel)
 │   ├── src/
@@ -17,8 +20,7 @@ doceria/
 │   │   └── server.js # Inicialização local
 │   ├── tests/        # Testes automatizados
 │   ├── .env          # Variáveis de ambiente (não commitado)
-│   ├── package.json  # Dependências e scripts
-│   └── vercel.json   # Config de deploy Vercel
+│   └── package.json  # Dependências e scripts do backend
 ├── frontend/         # Interface Web (HTML + CSS + JS Vanilla)
 │   ├── index.html
 │   ├── style.css
@@ -35,30 +37,41 @@ doceria/
 - 📋 **Contexto da Aplicação**: [`Contexto.md`](./Contexto.md)
 - 📖 **Documentação da API**: [`api.md`](./api.md)
 
-## 🚀 Como Rodar
+## 🚀 Como Rodar Localmente
 
 ### Instalar dependências
 ```bash
-cd backend
 npm install
 ```
 
 ### Rodar a aplicação (modo desenvolvimento)
 ```bash
-cd backend
 npm run dev
 ```
 Acesse `http://localhost:3000` no seu navegador.
 
 ### Rodar os testes
 ```bash
-cd backend
 npm test
 ```
 
-## ⚙️ Configuração
+## ☁️ Como Fazer Deploy na Vercel
 
-Configure as variáveis de ambiente no arquivo `backend/.env`:
+1. **Repositório no GitHub**: Suba as alterações para o seu repositório no GitHub (`git push origin main`).
+2. **Importar na Vercel**:
+   - Conecte o repositório na Vercel.
+   - Deixe o campo **Root Directory** como `./` (raiz padrão). O arquivo [`vercel.json`](./vercel.json) na raiz gerenciará automaticamente as rotas do frontend e as Serverless Functions da API.
+3. **Variáveis de Ambiente na Vercel**:
+   - Acesse **Settings** > **Environment Variables** no projeto da Vercel.
+   - Adicione a variável `MONGODB_URI` com a connection string do seu banco MongoDB Atlas (gratuito):
+     ```env
+     MONGODB_URI=mongodb+srv://<usuario>:<senha>@<cluster>.mongodb.net/doceriadb?retryWrites=true&w=majority
+     ```
+4. **Deploy**: O deploy será concluído e sua aplicação estará disponível no domínio `.vercel.app` servindo tanto o frontend quanto os endpoints `/api/doces`.
+
+## ⚙️ Configuração Local
+
+Configure as variáveis de ambiente no arquivo `backend/.env` (ou na raiz):
 
 ```env
 PORT=3000
@@ -66,4 +79,5 @@ MONGODB_URI=mongodb+srv://<usuario>:<senha>@<cluster>.mongodb.net/doceriadb
 NODE_ENV=development
 ```
 
-> 💡 Se o MongoDB não estiver disponível, o sistema usa automaticamente um banco em memória para desenvolvimento.
+> 💡 Se o MongoDB não estiver disponível em desenvolvimento local, o sistema usa automaticamente um banco em memória (`mongodb-memory-server`). Na Vercel (produção), configure a variável `MONGODB_URI`.
+
